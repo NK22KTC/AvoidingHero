@@ -8,13 +8,16 @@ public class TitleButtonManager : MonoBehaviour
 {
     TitleSoundManager soundManager;
 
-    [SerializeField]
-    GameObject titlePanel, skillStorePanel, fadePanel, StageSelectPanel;
+    [SerializeField] private GameObject titlePanel;
+    [SerializeField] private GameObject fadePanel;
+    [SerializeField] private GameObject StageSelectPanel;
 
-    [SerializeField]
-    AudioSource SE_Audio;
+    [SerializeField] private Button startgameButton;
+    [SerializeField] private Button returnTitleButton;
 
-    [SerializeField] private bool doDebug = false;
+    [SerializeField] AudioSource SE_Audio;
+
+    private bool DoDebug => Input.GetKey(KeyCode.LeftShift);
 
     bool gameStart = false;
 
@@ -24,7 +27,32 @@ public class TitleButtonManager : MonoBehaviour
 
     void Start()
     {
+        Init();
+    }
+
+    private void Init()
+    {
         soundManager = GetComponent<TitleSoundManager>();
+
+        startgameButton.onClick.AddListener(() =>
+        {
+            if (DoDebug)
+            {
+                ButtonSE();
+                titlePanel.SetActive(false);
+                StageSelectPanel.SetActive(true);
+            }
+            else
+            {
+                ButtonSE();
+                OnChangeActivePanel(StageSelectPanel);
+            }
+        });
+        returnTitleButton.onClick.AddListener(() =>
+        {
+            StageSelectPanel.SetActive(false);
+            titlePanel.SetActive(true);
+        });
     }
 
 
@@ -62,11 +90,8 @@ public class TitleButtonManager : MonoBehaviour
 
     public void OnChangeActivePanel(GameObject panel)
     {
-        ButtonSE();
-        if (doDebug)
+        if (DoDebug)
         {
-            titlePanel.SetActive(!titlePanel.activeSelf);
-            panel.SetActive(!panel.activeSelf);
             if (soundManager.enabled) soundManager.ChangeSound(panel);
         }
         else
